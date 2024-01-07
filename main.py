@@ -14,10 +14,8 @@ load_dotenv()
 
 def notify(text, title="Bayesian Wastewater Process", priority='default', tags=None):
     """Send a notification to ntfy.sh"""
-    ntfy_endpoint = os.getenv('NTFY_ENDPOINT', None)
-    if ntfy_endpoint is None:
-        warnings.warn("NTFY_ENDPOINT not set, skipping notification")
-        return
+    ntfy_endpoint = os.getenv('NTFY_ENDPOINT', "https://ntfy.sh")
+    ntfy_channel = os.getenv('NTFY_CHANNEL', "3ea72770b3c56176769740a36c6a1d90")
 
     headers = {
         'Title': title,
@@ -28,7 +26,8 @@ def notify(text, title="Bayesian Wastewater Process", priority='default', tags=N
     if tags is not None:
         headers['Tags'] = ','.join(tags)
 
-    requests.post("{}/bayesianTS".format(ntfy_endpoint),
+    
+    requests.post("{}/{}".format(ntfy_endpoint,ntfy_channel),
                   data=text,
                   headers=headers)
     pass
@@ -86,12 +85,14 @@ def main():
     ww.component_distributions()
 
     # Notify:
-    requests.put("{}/bayesianTS".format(os.getenv('NTFY_ENDPOINT', None)),
-                 data=open("output/forecast_{}.png".format(location), 'rb'),
-                 headers={
-                     "Title": "Wastewater Trend for {}".format(location),
-                     "Tags": "checkered_flag",
-                     "Filename": "forecast_{}.png".format(location)})
+    requests.put("{}/{}".format(
+        os.getenv('NTFY_ENDPOINT', "https://ntfy.sh"),
+        os.getenv("NTFY_CHANNEL","3ea72770b3c56176769740a36c6a1d90")),
+        data=open("output/forecast_{}.png".format(location), 'rb'),
+        headers={
+            "Title": "Wastewater Trend for {}".format(location),
+            "Tags": "checkered_flag",
+            "Filename": "forecast_{}.png".format(location)})
 
 if __name__ == "__main__":
     main()
