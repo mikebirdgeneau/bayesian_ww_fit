@@ -1,0 +1,7 @@
+/venv/
+/output/data.json
+/output/
+.env
+
+#__pycache__
+*.py[cod]
